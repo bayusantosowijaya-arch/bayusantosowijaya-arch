@@ -1,78 +1,74 @@
 import streamlit as st
-import pandas as pd
+import math
+import locale
 from datetime import datetime
 
-st.set_page_config(page_title="Simulasi KPR Free PPN", layout="wide")
+# ─── Page Config ──────────────────────────────────────────────────────────────
+st.set_page_config(
+    page_title="Simulasi KPR – Ruang Masbay",
+    page_icon="🏠",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
-st.title("🏠 Simulasi KPR Free PPN 2026")
-st.markdown("**Free PPN 100% (< 2M) | Free PPN Rp 220 Juta (≥ 2M)**")
+# ─── Custom CSS ───────────────────────────────────────────────────────────────
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-col1, col2 = st.columns(2)
-with col1:
-    harga = st.number_input("Harga Rumah (Rp)", value=1946801250, step=1000000)
-    dp_persen = st.slider("DP (%)", 5, 30, 10)
+:root {
+    --gold:    #C9A84C;
+    --gold-lt: #E8C97B;
+    --navy:    #0D1B2A;
+    --navy-lt: #152336;
+    --cream:   #F5F0E8;
+    --slate:   #6B7A8D;
+    --green:   #2ECC71;
+    --red:     #E74C3C;
+    --white:   #FFFFFF;
+}
 
-with col2:
-    bunga = st.number_input("Suku Bunga (%)", value=3.70, step=0.05)
-    tenor = st.selectbox("Tenor (Tahun)", [5,8,10,15,20,25], index=4)
+html, body, [class*="css"] {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--navy);
+    color: var(--cream);
+}
 
-if harga < 2000000000:
-    ppn = harga * 0.11
-    ket = "Free PPN 100%"
-else:
-    ppn = 220000000
-    ket = "Free PPN Rp 220 Juta"
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0D1B2A 0%, #152336 100%);
+    border-right: 1px solid rgba(201,168,76,0.3);
+}
+[data-testid="stSidebar"] .stSlider > div > div > div {
+    background: var(--gold) !important;
+}
+[data-testid="stSidebar"] label {
+    color: var(--cream) !important;
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
 
-harga_jual = harga - ppn
-dp = harga_jual * (dp_persen / 100)
-plafon = harga_jual - dp
-
-def hitung_angsuran(pokok, rate, tahun):
-    r = rate / 100 / 12
-    n = tahun * 12
-    if r == 0:
-        return pokok / n
-    return pokok * (r * (1 + r)**n) / ((1 + r)**n - 1)
-
-angsuran = hitung_angsuran(plafon, bunga, tenor)
-
-st.divider()
-c1, c2 = st.columns(2)
-with c1:
-    st.metric("Harga Rumah", f"Rp {harga:,.0f}")
-    st.metric("PPN Ditanggung", f"Rp {ppn:,.0f}", ket)
-    st.metric("Harga Jual", f"Rp {harga_jual:,.0f}")
-    st.metric("Down Payment", f"Rp {dp:,.0f} ({dp_persen}%)")
-
-with c2:
-    st.metric("Plafon KPR", f"Rp {plafon:,.0f}")
-    st.metric("Angsuran Bulanan", f"Rp {angsuran:,.0f}", f"{tenor} Tahun")
-
-st.subheader("Simulasi 12 Bulan Pertama")
-data = []
-sisa = plafon
-r = bunga / 100 / 12
-for i in range(1,13):
-    bunga_bln = sisa * r
-    pokok_bln = angsuran - bunga_bln
-    sisa -= pokok_bln
-    data.append([i, round(angsuran), round(pokok_bln), round(bunga_bln), round(sisa)])
-
-df = pd.DataFrame(data, columns=["Bulan","Angsuran","Pokok","Bunga","Sisa Pokok"])
-st.dataframe(df.style.format("{:,.0f}"), use_container_width=True)
-
-if st.button("📥 Download Excel", type="primary"):
-    output = pd.ExcelWriter("simulasi_kpr.xlsx", engine='openpyxl')
-    pd.DataFrame({
-        "Keterangan": ["Harga Rumah", "PPN", "Harga Jual", "DP", "Plafon", "Bunga", "Tenor", "Angsuran"],
-        "Nilai": [harga, ppn, harga_jual, dp, plafon, f"{bunga}%", f"{tenor} Tahun", angsuran]
-    }).to_excel(output, sheet_name="Ringkasan", index=False)
-    df.to_excel(output, sheet_name="12 Bulan", index=False)
-    output.close()
-    
-    with open("simulasi_kpr.xlsx", "rb") as f:
-        st.download_button("💾 Simpan File Excel", f.read(), 
-                          f"Simulasi_KPR_{datetime.now().strftime('%Y%m%d')}.xlsx",
-                          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-
-st.caption("Simulasi Free PPN 2026")
+.header-wrap {
+    background: linear-gradient(135deg, #152336 0%, #0D1B2A 60%, #1a2840 100%);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+.header-wrap::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+}
+.logo-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
