@@ -1,13 +1,29 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-
+PASSWORD_AKSES = "KPR2026" 
 st.set_page_config(
-    page_title="Simulasi KPR Free PPN – Ruang Masbay",
+    page_title="Simulasi KPR Free PPN - Ruang Masbay",
     page_icon="🏠",
     layout="wide",
-    initial_sidebar_state="expanded",
-)
+    initial_sidebar_state="expanded"
+
+if 'authenticated' not in st.session_state:
+    st.session_state['authenticated'] = False
+
+if not st.session_state['authenticated']:
+    st.title("🔐 KPR Simulator 2026 - Mas Bay")
+    st.info("Untuk mendapatkan password akses, hubungi WhatsApp: 0878-8425-6765")
+    
+    user_input = st.text_input("Masukkan Password Akses:", type="password")
+    
+    if st.button("Buka Aplikasi"):
+        if user_input == PASSWORD_AKSES:
+            st.session_state['authenticated'] = True
+            st.rerun()
+        else:
+            st.error("Password salah! Silakan hubungi admin.")
+    st.stop() 
 
 st.markdown("""
 <style>
