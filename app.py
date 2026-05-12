@@ -1,12 +1,15 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+
 PASSWORD_AKSES = "KPR2026" 
+
 st.set_page_config(
     page_title="Simulasi KPR Free PPN - Ruang Masbay",
     page_icon="🏠",
     layout="wide",
     initial_sidebar_state="expanded"
+) 
 
 if 'authenticated' not in st.session_state:
     st.session_state['authenticated'] = False
