@@ -170,15 +170,47 @@ div[data-testid="stHorizontalBlock"] > div:hover{
 
 @media(max-width:768px){
 
-    .block-container{
-        padding-left:1rem;
-        padding-right:1rem;
+    .metric-grid{
+        grid-template-columns:1fr !important;
+        gap:14px;
     }
 
-    [data-testid="stMetricValue"]{
-        font-size:1.5rem;
-    }
+    .metric-card{
+    padding:20px !important;
+    border-radius:24px !important;
+}
 
+    .metric-value{
+    font-size:1.15rem !important;
+    letter-spacing:0.3px;
+}
+
+    .metric-value.big{
+    font-size:1.6rem !important;
+    line-height:1.2;
+}
+
+    .angsuran-box{
+    padding:22px !important;
+    border-radius:28px !important;
+    backdrop-filter:blur(18px);
+}
+
+    .angsuran-value{
+    font-size:2rem !important;
+    line-height:1.1;
+    letter-spacing:-0.5px;
+}
+
+    .header-sub{
+    line-height:1.9 !important;
+    font-size:0.92rem !important;
+    opacity:0.88;
+}
+
+    .stDataFrame{
+        overflow-x:auto;
+    }
 }
 
 /* ===== HERO ===== */
