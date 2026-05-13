@@ -1,6 +1,7 @@
+import streamlit as st
 import pandas as pd
-‎from datetime import datetime
-‎
+from datetime import datetime
+
 ‎PASSWORD_AKSES = "KPR2026" 
 ‎
 ‎st.set_page_config(
@@ -23,9 +24,10 @@ import pandas as pd
 ‎        if user_input == PASSWORD_AKSES:
 ‎            st.session_state['authenticated'] = True
 ‎            st.rerun()
-‎        else:
-‎            st.error("Password salah! Silakan hubungi admin.")
-‎    st.stop() 
+‎                else:
+            st.error("Password salah! Silakan coba lagi.")
+            st.stop()
+
 
 
 st.markdown("""
