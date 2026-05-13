@@ -30,71 +30,159 @@ if not st.session_state['authenticated']:
 
 st.markdown("""
 <style>
-/* Reset ke font yang lebih bersih */
-html, body, [data-testid="stAppViewContainer"] {
-    background-color: #0E1117;
-    font-family: 'Inter', -apple-system, sans-serif;
+
+/* ===== GLOBAL ===== */
+
+:root{
+    --bg:#071018;
+    --card:#0F1722;
+    --gold:#D4B06A;
+    --text:#F8FAFC;
+    --muted:#94A3B8;
+    --line:rgba(255,255,255,0.06);
 }
 
-/* Kotak Highlight di Atas agar tidak makan tempat */
-div[data-testid="stHorizontalBlock"] > div:has(div.stMarkdown) {
-    background: #161B22;
-    border: 1px solid rgba(201, 168, 76, 0.2);
-    border-radius: 8px;
-    padding: 10px;
+html, body, [data-testid="stAppViewContainer"]{
+    background:
+        radial-gradient(circle at top left,
+        rgba(212,176,106,0.08),
+        transparent 25%),
+
+        linear-gradient(180deg,
+        #050B12 0%,
+        #09111A 100%);
+
+    color:var(--text);
 }
 
-/* Memperbaiki tampilan tabel agar rapat & profesional */
-.stMarkdown table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    margin-bottom: 20px !important;
+/* Hide Streamlit */
+
+#MainMenu,
+footer,
+header{
+    visibility:hidden;
 }
 
-.stMarkdown th {
-    background-color: #1F2937 !important;
-    color: #C9A84C !important;
-    font-size: 0.85rem !important;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 8px !important;
+[data-testid="stHeader"]{
+    background:transparent;
 }
 
-.stMarkdown td {
-    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
-    padding: 6px 10px !important;
-    font-size: 0.9rem !important;
+.block-container{
+    padding-top:2rem;
+    max-width:1400px;
 }
 
-/* Warna angka spesifik */
-.stMarkdown td:last-child {
-    font-weight: 600;
-    text-align: right;
+/* ===== CARD ===== */
+
+div[data-testid="stHorizontalBlock"] > div{
+    background:
+        linear-gradient(180deg,
+        rgba(15,23,34,0.95),
+        rgba(9,14,22,0.95));
+
+    border:1px solid rgba(255,255,255,0.05);
+
+    border-radius:24px;
+
+    padding:24px;
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,0.35);
+
+    backdrop-filter: blur(12px);
+
+    transition:0.3s ease;
 }
 
-/* Sembunyikan spasi berlebih dari Streamlit */
-[data-testid="stHeader"] {background: rgba(0,0,0,0);}
-div.block-container {padding-top: 2rem;}
-</style>
-{
-    width: 100%;
-    margin-top: 1rem;
+div[data-testid="stHorizontalBlock"] > div:hover{
+    transform:translateY(-4px);
+
+    border:1px solid rgba(212,176,106,0.20);
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,0.45);
 }
 
-.luxury-table td {
-    padding: 1rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+/* ===== TABLE ===== */
+
+.stMarkdown table{
+    width:100%;
+    border-collapse:collapse;
+
+    background:rgba(255,255,255,0.02);
+
+    border-radius:20px;
+    overflow:hidden;
+
+    border:1px solid rgba(255,255,255,0.05);
 }
 
-.val-gold {
-    text-align: right;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.3rem;
-    color: var(--gold);
+.stMarkdown th{
+    background:#16202D;
+
+    color:var(--gold) !important;
+
+    text-transform:uppercase;
+
+    letter-spacing:2px;
+
+    font-size:0.75rem !important;
+
+    padding:16px !important;
 }
+
+.stMarkdown td{
+    padding:14px !important;
+
+    border-bottom:
+        1px solid rgba(255,255,255,0.04);
+
+    font-size:0.95rem !important;
+}
+
+/* ===== METRIC ===== */
+
+[data-testid="stMetric"]{
+    background:
+        linear-gradient(180deg,
+        rgba(15,23,34,0.95),
+        rgba(9,14,22,0.95));
+
+    border:1px solid rgba(255,255,255,0.05);
+
+    padding:24px;
+
+    border-radius:24px;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,0.35);
+}
+
+[data-testid="stMetricValue"]{
+    font-size:2.1rem;
+
+    font-weight:700;
+
+    color:#FFFFFF;
+}
+
+/* ===== MOBILE ===== */
+
+@media(max-width:768px){
+
+    .block-container{
+        padding-left:1rem;
+        padding-right:1rem;
+    }
+
+    [data-testid="stMetricValue"]{
+        font-size:1.5rem;
+    }
+
+}
+
 </style>
 """, unsafe_allow_html=True)
-
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def rb(v):
