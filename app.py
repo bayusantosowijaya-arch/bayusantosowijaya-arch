@@ -1,330 +1,90 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+‎
+‎PASSWORD_AKSES = "KPR2026" 
+‎
+‎st.set_page_config(
+‎    page_title="Simulasi KPR Free PPN - Ruang Masbay",
+‎    page_icon="🏠",
+‎    layout="wide",
+‎    initial_sidebar_state="expanded"
+‎) 
+‎
+‎if 'authenticated' not in st.session_state:
+‎    st.session_state['authenticated'] = False
+‎
+‎if not st.session_state['authenticated']:
+‎    st.title("🔐 KPR Simulator 2026 - Mas Bay")
+‎    st.info("Untuk mendapatkan password akses, hubungi WhatsApp: 0878-8425-6765")
+‎    
+‎    user_input = st.text_input("Masukkan Password Akses:", type="password")
+‎    
+‎    if st.button("Buka Aplikasi"):
+‎        if user_input == PASSWORD_AKSES:
+‎            st.session_state['authenticated'] = True
+‎            st.rerun()
+‎        else:
+‎            st.error("Password salah! Silakan hubungi admin.")
+‎    st.stop() 
 
-PASSWORD_AKSES = "KPR2026" 
+import streamlit as st
+import pandas as pd
+from datetime import datetime
 
 st.set_page_config(
-    page_title="Simulasi KPR Free PPN - Ruang Masbay",
+    page_title="Simulasi KPR Free PPN – Ruang Masbay",
     page_icon="🏠",
     layout="wide",
-    initial_sidebar_state="expanded"
-) 
-
-if 'authenticated' not in st.session_state:
-    st.session_state['authenticated'] = False
-
-if not st.session_state['authenticated']:
-    st.title("🔐 KPR Simulator 2026 - Mas Bay")
-    st.info("Untuk mendapatkan password akses, hubungi WhatsApp: 0878-8425-6765")
-    
-    user_input = st.text_input("Masukkan Password Akses:", type="password")
-    
-    if st.button("Buka Aplikasi"):
-        if user_input == PASSWORD_AKSES:
-            st.session_state['authenticated'] = True
-            st.rerun()
-        else:
-            st.error("Password salah! Silakan hubungi admin.")
-    st.stop() 
+    initial_sidebar_state="expanded",
+)
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap');
-/* ===== GLOBAL ===== */
-
-:root{
-    --bg:#071018;
-    --card:#0F1722;
-    --gold:#D4B06A;
-    --text:#F8FAFC;
-    --muted:#94A3B8;
-    --line:rgba(255,255,255,0.06);
-}
-
-html, body, [data-testid="stAppViewContainer"]{
-    background:
-        radial-gradient(circle at top left,
-        rgba(212,176,106,0.08),
-        transparent 25%),
-
-        linear-gradient(180deg,
-        #050B12 0%,
-        #09111A 100%);
-
-    color:var(--text);
-}
-
-/* Hide Streamlit */
-
-#MainMenu,
-footer,
-header{
-    visibility:hidden;
-}
-
-[data-testid="stHeader"]{
-    background:transparent;
-}
-
-.block-container{
-    padding-top:2rem;
-    max-width:1400px;
-}
-
-/* ===== CARD ===== */
-
-div[data-testid="stHorizontalBlock"] > div{
-    background:
-        linear-gradient(180deg,
-        rgba(15,23,34,0.95),
-        rgba(9,14,22,0.95));
-
-    border:1px solid rgba(255,255,255,0.05);
-
-    border-radius:24px;
-
-    padding:24px;
-
-    box-shadow:
-        0 10px 40px rgba(0,0,0,0.35);
-
-    backdrop-filter: blur(12px);
-
-    transition:0.3s ease;
-}
-
-div[data-testid="stHorizontalBlock"] > div:hover{
-    transform:translateY(-4px);
-
-    border:1px solid rgba(212,176,106,0.20);
-
-    box-shadow:
-        0 20px 60px rgba(0,0,0,0.45);
-}
-
-/* ===== TABLE ===== */
-
-.stMarkdown table{
-    width:100%;
-    border-collapse:collapse;
-
-    background:rgba(255,255,255,0.02);
-
-    border-radius:20px;
-    overflow:hidden;
-
-    border:1px solid rgba(255,255,255,0.05);
-}
-
-.stMarkdown th{
-    background:#16202D;
-
-    color:var(--gold) !important;
-
-    text-transform:uppercase;
-
-    letter-spacing:2px;
-
-    font-size:0.75rem !important;
-
-    padding:16px !important;
-}
-
-.stMarkdown td{
-    padding:14px !important;
-
-    border-bottom:
-        1px solid rgba(255,255,255,0.04);
-
-    font-size:0.95rem !important;
-}
-
-/* ===== METRIC ===== */
-
-[data-testid="stMetric"]{
-    background:
-        linear-gradient(180deg,
-        rgba(15,23,34,0.95),
-        rgba(9,14,22,0.95));
-
-    border:1px solid rgba(255,255,255,0.05);
-
-    padding:24px;
-
-    border-radius:24px;
-
-    box-shadow:
-        0 10px 35px rgba(0,0,0,0.35);
-}
-
-[data-testid="stMetricValue"]{
-    font-size:2.1rem;
-
-    font-weight:700;
-
-    color:#FFFFFF;
-}
-
-/* ===== MOBILE ===== */
-
-@media(max-width:768px){
-
-    .metric-grid{
-        grid-template-columns:1fr !important;
-        gap:14px;
-    }
-
-    .metric-card{
-    padding:20px !important;
-    border-radius:24px !important;
-}
-
-    .metric-value{
-    font-size:1.15rem !important;
-    letter-spacing:0.3px;
-}
-
-    .metric-value.big{
-    font-size:1.6rem !important;
-    line-height:1.2;
-}
-
-    .angsuran-box{
-    padding:22px !important;
-    border-radius:28px !important;
-    backdrop-filter:blur(18px);
-}
-
-    .angsuran-value{
-    font-size:2rem !important;
-    line-height:1.1;
-    letter-spacing:-0.5px;
-}
-
-    .header-sub{
-    line-height:1.9 !important;
-    font-size:0.92rem !important;
-    opacity:0.88;
-}
-
-    .stDataFrame{
-        overflow-x:auto;
-    }
-}
-
-/* ===== HERO ===== */
-.lux-hero{
-    background:
-    radial-gradient(circle at top left, rgba(212,176,106,0.12), transparent 40%),
-    linear-gradient(135deg,#0F1722,#091018);
-
-    border:1px solid rgba(255,255,255,0.06);
-    border-radius:28px;
-
-    padding:48px 32px;
-    margin-bottom:28px;
-
-    box-shadow:
-    0 10px 40px rgba(0,0,0,0.45),
-    inset 0 1px 0 rgba(255,255,255,0.04);
-
-    position:relative;
-    overflow:hidden;
-}
-
-.lux-hero::before{
-    content:"";
-    position:absolute;
-    inset:0;
-
-    background:
-    linear-gradient(
-        120deg,
-        transparent 20%,
-        rgba(255,255,255,0.03) 50%,
-        transparent 80%
-    );
-
-    transform:translateX(-100%);
-    animation:shine 8s infinite;
-}
-
-@keyframes shine{
-    100%{
-        transform:translateX(100%);
-    }
-}
-
-.lux-title{
-    font-family:'Cormorant Garamond', serif;
-    font-size:3rem;
-    color:#D4B06A;
-    font-weight:700;
-    letter-spacing:1px;
-    margin-bottom:10px;
-}
-
-.lux-sub{
-    color:#94A3B8;
-    font-size:1rem;
-    line-height:1.8;
-}
-.lux-hero{
-
-    padding:48px 10px 36px 10px;
-
-    margin-bottom:20px;
-}
-
-.lux-badge{
-
-    display:inline-block;
-
-    padding:8px 16px;
-
-    border-radius:999px;
-
-    background:rgba(212,176,106,0.08);
-
-    border:1px solid rgba(212,176,106,0.18);
-
-    color:#D4B06A;
-
-    letter-spacing:2px;
-
-    font-size:0.72rem;
-
-    margin-bottom:24px;
-}
-
-.lux-title{
-
-    font-family:'Cormorant Garamond', serif;
-
-    font-size:4.2rem;
-
-    line-height:1;
-
-    font-weight:600;
-
-    color:white;
-
-    margin-bottom:16px;
-}
-
-.lux-sub{
-
-    max-width:700px;
-
-    color:#94A3B8;
-
-    line-height:1.8;
-
-    font-size:1rem;
-}
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root{--gold:#C9A84C;--gold-lt:#E8C97B;--navy:#0D1B2A;--cream:#F5F0E8;--slate:#6B7A8D;--green:#2ECC71;--red:#E74C3C;}
+html,body,[class*="css"]{font-family:'DM Sans',sans-serif;background-color:var(--navy);color:var(--cream);}
+[data-testid="stSidebar"]{background:linear-gradient(180deg,#0D1B2A 0%,#152336 100%);border-right:1px solid rgba(201,168,76,0.3);}
+[data-testid="stSidebar"] label{color:var(--cream)!important;font-weight:500;font-size:0.84rem;letter-spacing:0.04em;text-transform:uppercase;}
+.header-wrap{background:linear-gradient(135deg,#152336 0%,#0D1B2A 60%,#1a2840 100%);border:1px solid rgba(201,168,76,0.35);border-radius:16px;padding:2rem 2.5rem;margin-bottom:1.5rem;position:relative;overflow:hidden;}
+.header-wrap::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(201,168,76,0.12) 0%,transparent 70%);border-radius:50%;}
+.brand-name{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;background:linear-gradient(135deg,var(--gold-lt),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;}
+.brand-tagline{font-size:0.78rem;color:var(--slate);letter-spacing:0.15em;text-transform:uppercase;margin-top:2px;}
+.header-title{font-family:'Playfair Display',serif;font-size:1.45rem;font-weight:700;color:var(--cream);margin-top:0.75rem;}
+.header-sub{font-size:0.84rem;color:var(--slate);margin-top:0.25rem;}
+.harga-display{background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.35);border-radius:8px;padding:0.5rem 0.75rem;font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--gold);text-align:center;margin:0.25rem 0 0.6rem;}
+.mode-box-inc{background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.35);border-radius:10px;padding:0.75rem 1rem;font-size:0.8rem;color:#2ECC71;line-height:1.6;margin-bottom:0.5rem;}
+.mode-box-exc{background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.35);border-radius:10px;padding:0.75rem 1rem;font-size:0.8rem;color:#E74C3C;line-height:1.6;margin-bottom:0.5rem;}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:1rem;margin-bottom:1.5rem;}
+.metric-card{background:linear-gradient(135deg,#152336,#1a2a40);border:1px solid rgba(201,168,76,0.2);border-radius:12px;padding:1.1rem 1.3rem;position:relative;overflow:hidden;transition:border-color 0.3s;}
+.metric-card:hover{border-color:rgba(201,168,76,0.5);}
+.metric-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-lt));border-radius:0 0 12px 12px;}
+.metric-label{font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--slate);margin-bottom:0.35rem;}
+.metric-value{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;color:var(--gold-lt);line-height:1.1;}
+.metric-value.big{font-size:1.6rem;color:var(--gold);}
+.metric-note{font-size:0.7rem;color:var(--slate);margin-top:0.3rem;line-height:1.4;}
+.section-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--gold-lt);border-left:3px solid var(--gold);padding-left:0.75rem;margin:1.5rem 0 1rem;}
+.calc-table{width:100%;border-collapse:collapse;font-size:0.86rem;margin-bottom:1rem;}
+.calc-table th{background:rgba(201,168,76,0.15);color:var(--gold-lt);font-weight:600;letter-spacing:0.07em;text-transform:uppercase;font-size:0.72rem;padding:0.6rem 0.9rem;text-align:left;border-bottom:1px solid rgba(201,168,76,0.3);}
+.calc-table td{padding:0.55rem 0.9rem;border-bottom:1px solid rgba(255,255,255,0.05);color:var(--cream);vertical-align:middle;}
+.calc-table tr:last-child td{border-bottom:none;}
+.calc-table tr:hover td{background:rgba(201,168,76,0.04);}
+.calc-table .hl td{font-weight:600;color:var(--gold-lt);background:rgba(201,168,76,0.08);}
+.calc-table .tot td{font-family:'Playfair Display',serif;font-size:0.95rem;font-weight:700;color:var(--gold);background:rgba(201,168,76,0.12);border-top:1px solid rgba(201,168,76,0.4);}
+.tag-free{background:rgba(46,204,113,0.2);color:#2ECC71;border:1px solid rgba(46,204,113,0.4);border-radius:4px;padding:1px 7px;font-size:0.7rem;font-weight:600;}
+.tag-220{background:rgba(201,168,76,0.2);color:var(--gold-lt);border:1px solid rgba(201,168,76,0.4);border-radius:4px;padding:1px 7px;font-size:0.7rem;font-weight:600;}
+.info-box{background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:1rem 1.25rem;font-size:0.82rem;color:var(--cream);line-height:1.65;margin-bottom:1rem;}
+.info-box strong{color:var(--gold-lt);}
+.angsuran-box{background:linear-gradient(135deg,rgba(201,168,76,0.18),rgba(201,168,76,0.06));border:2px solid rgba(201,168,76,0.5);border-radius:14px;padding:1.5rem 2rem;text-align:center;margin-bottom:1.5rem;}
+.angsuran-label{font-size:0.76rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--slate);margin-bottom:0.4rem;}
+.angsuran-value{font-family:'Playfair Display',serif;font-size:2.4rem;font-weight:900;color:var(--gold);}
+.angsuran-sub{font-size:0.78rem;color:var(--slate);margin-top:0.3rem;}
+.footer{text-align:center;padding:1.5rem;font-size:0.75rem;color:var(--slate);border-top:1px solid rgba(201,168,76,0.15);margin-top:2rem;}
+.footer span{color:var(--gold-lt);}
+.gold-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.5),transparent);margin:1.5rem 0;}
 </style>
 """, unsafe_allow_html=True)
+
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def rb(v):
@@ -656,6 +416,7 @@ with col_left:
         </tbody>
     </table>""", unsafe_allow_html=True)
 
+    
     # Tabel Biaya Transaksi
     st.markdown('<div class="section-title">Biaya Transaksi</div>', unsafe_allow_html=True)
     st.markdown(f"""
