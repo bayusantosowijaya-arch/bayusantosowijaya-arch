@@ -1,6 +1,5 @@
-import streamlit as st
 import pandas as pd
-from datetime import datetime
+‎from datetime import datetime
 ‎
 ‎PASSWORD_AKSES = "KPR2026" 
 ‎
@@ -27,10 +26,6 @@ from datetime import datetime
 ‎        else:
 ‎            st.error("Password salah! Silakan hubungi admin.")
 ‎    st.stop() 
-
-import streamlit as st
-import pandas as pd
-from datetime import datetime
 
 st.set_page_config(
     page_title="Simulasi KPR Free PPN – Ruang Masbay",
