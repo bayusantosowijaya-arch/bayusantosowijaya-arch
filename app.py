@@ -30,48 +30,53 @@ if not st.session_state['authenticated']:
 
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500&display=swap');
-
-:root {
-    --gold: #D4AF37;
-    --bg-black: #0A0F12;
-}
-
+/* Reset ke font yang lebih bersih */
 html, body, [data-testid="stAppViewContainer"] {
-    background-color: var(--bg-black);
-    color: #F8F9FA;
-    font-family: 'Inter', sans-serif;
+    background-color: #0E1117;
+    font-family: 'Inter', -apple-system, sans-serif;
 }
 
-[data-testid="stSidebar"] {
-    background-color: #070B0D;
-    border-right: 1px solid rgba(212, 175, 55, 0.2);
+/* Kotak Highlight di Atas agar tidak makan tempat */
+div[data-testid="stHorizontalBlock"] > div:has(div.stMarkdown) {
+    background: #161B22;
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-radius: 8px;
+    padding: 10px;
 }
 
-.brand-header {
-    text-align: center;
-    padding: 2.5rem 0;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-    margin-bottom: 2rem;
+/* Memperbaiki tampilan tabel agar rapat & profesional */
+.stMarkdown table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 20px !important;
 }
 
-.brand-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 3.5rem;
-    color: var(--gold);
-    letter-spacing: 0.15em;
+.stMarkdown th {
+    background-color: #1F2937 !important;
+    color: #C9A84C !important;
+    font-size: 0.85rem !important;
     text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px !important;
 }
 
-.hero-box {
-    background: linear-gradient(180deg, #12181E 0%, #0A0F12 100%);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    padding: 4rem;
-    text-align: center;
-    margin-bottom: 2.5rem;
+.stMarkdown td {
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    padding: 6px 10px !important;
+    font-size: 0.9rem !important;
 }
 
-.luxury-table {
+/* Warna angka spesifik */
+.stMarkdown td:last-child {
+    font-weight: 600;
+    text-align: right;
+}
+
+/* Sembunyikan spasi berlebih dari Streamlit */
+[data-testid="stHeader"] {background: rgba(0,0,0,0);}
+div.block-container {padding-top: 2rem;}
+</style>
+{
     width: 100%;
     margin-top: 1rem;
 }
