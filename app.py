@@ -182,7 +182,62 @@ div[data-testid="stHorizontalBlock"] > div:hover{
 }
 
 /* ===== HERO ===== */
+.lux-hero{
+    background:
+    radial-gradient(circle at top left, rgba(212,176,106,0.12), transparent 40%),
+    linear-gradient(135deg,#0F1722,#091018);
 
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:28px;
+
+    padding:48px 32px;
+    margin-bottom:28px;
+
+    box-shadow:
+    0 10px 40px rgba(0,0,0,0.45),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+
+    position:relative;
+    overflow:hidden;
+}
+
+.lux-hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background:
+    linear-gradient(
+        120deg,
+        transparent 20%,
+        rgba(255,255,255,0.03) 50%,
+        transparent 80%
+    );
+
+    transform:translateX(-100%);
+    animation:shine 8s infinite;
+}
+
+@keyframes shine{
+    100%{
+        transform:translateX(100%);
+    }
+}
+
+.lux-title{
+    font-family:'Cormorant Garamond', serif;
+    font-size:3rem;
+    color:#D4B06A;
+    font-weight:700;
+    letter-spacing:1px;
+    margin-bottom:10px;
+}
+
+.lux-sub{
+    color:#94A3B8;
+    font-size:1rem;
+    line-height:1.8;
+}
 .lux-hero{
 
     padding:48px 10px 36px 10px;
