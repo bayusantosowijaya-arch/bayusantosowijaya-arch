@@ -27,12 +27,6 @@ import pandas as pd
 ‎            st.error("Password salah! Silakan hubungi admin.")
 ‎    st.stop() 
 
-st.set_page_config(
-    page_title="Simulasi KPR Free PPN – Ruang Masbay",
-    page_icon="🏠",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
 
 st.markdown("""
 <style>
