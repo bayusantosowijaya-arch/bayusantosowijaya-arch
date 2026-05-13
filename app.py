@@ -30,7 +30,7 @@ if not st.session_state['authenticated']:
 
 st.markdown("""
 <style>
-
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&display=swap');
 /* ===== GLOBAL ===== */
 
 :root{
@@ -181,6 +181,61 @@ div[data-testid="stHorizontalBlock"] > div:hover{
 
 }
 
+/* ===== HERO ===== */
+
+.lux-hero{
+
+    padding:48px 10px 36px 10px;
+
+    margin-bottom:20px;
+}
+
+.lux-badge{
+
+    display:inline-block;
+
+    padding:8px 16px;
+
+    border-radius:999px;
+
+    background:rgba(212,176,106,0.08);
+
+    border:1px solid rgba(212,176,106,0.18);
+
+    color:#D4B06A;
+
+    letter-spacing:2px;
+
+    font-size:0.72rem;
+
+    margin-bottom:24px;
+}
+
+.lux-title{
+
+    font-family:'Cormorant Garamond', serif;
+
+    font-size:4.2rem;
+
+    line-height:1;
+
+    font-weight:600;
+
+    color:white;
+
+    margin-bottom:16px;
+}
+
+.lux-sub{
+
+    max-width:700px;
+
+    color:#94A3B8;
+
+    line-height:1.8;
+
+    font-size:1rem;
+}
 </style>
 """, unsafe_allow_html=True)
 
