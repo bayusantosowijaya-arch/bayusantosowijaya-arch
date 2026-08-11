@@ -1,0 +1,849 @@
+import streamlit as st
+import math
+import locale
+from datetime import datetime
+
+# ─── Page Config ──────────────────────────────────────────────────────────────
+st.set_page_config(
+    page_title="Simulasi KPR – Ruang Masbay",
+    page_icon="🏠",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# ─── Custom CSS ───────────────────────────────────────────────────────────────
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+    --gold:    #C9A84C;
+    --gold-lt: #E8C97B;
+    --navy:    #0D1B2A;
+    --navy-lt: #152336;
+    --cream:   #F5F0E8;
+    --slate:   #6B7A8D;
+    --green:   #2ECC71;
+    --red:     #E74C3C;
+    --white:   #FFFFFF;
+}
+
+html, body, [class*="css"] {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--navy);
+    color: var(--cream);
+}
+
+/* ── Sidebar ── */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0D1B2A 0%, #152336 100%);
+    border-right: 1px solid rgba(201,168,76,0.3);
+}
+[data-testid="stSidebar"] .stSlider > div > div > div {
+    background: var(--gold) !important;
+}
+[data-testid="stSidebar"] label {
+    color: var(--cream) !important;
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+/* ── Header ── */
+.header-wrap {
+    background: linear-gradient(135deg, #152336 0%, #0D1B2A 60%, #1a2840 100%);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+.header-wrap::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+}
+.logo-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+.logo-icon {
+    font-size: 2.8rem;
+    line-height: 1;
+}
+.brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gold-lt), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+}
+.brand-tagline {
+    font-size: 0.8rem;
+    color: var(--slate);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+.header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--cream);
+    margin-top: 0.75rem;
+}
+.header-sub {
+    font-size: 0.85rem;
+    color: var(--slate);
+    margin-top: 0.25rem;
+}
+
+/* ── Metric Cards ── */
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+.metric-card {
+    background: linear-gradient(135deg, #152336, #1a2a40);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+}
+.metric-card:hover { border-color: rgba(201,168,76,0.55); }
+.metric-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-lt));
+    border-radius: 0 0 12px 12px;
+}
+.metric-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 0.4rem;
+}
+.metric-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--gold-lt);
+    line-height: 1.1;
+}
+.metric-value.big {
+    font-size: 1.7rem;
+    color: var(--gold);
+}
+.metric-note {
+    font-size: 0.72rem;
+    color: var(--slate);
+    margin-top: 0.3rem;
+}
+
+/* ── Section Titles ── */
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--gold-lt);
+    border-left: 3px solid var(--gold);
+    padding-left: 0.75rem;
+    margin: 1.5rem 0 1rem;
+}
+
+/* ── Table ── */
+.calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin-bottom: 1rem;
+}
+.calc-table th {
+    background: rgba(201,168,76,0.15);
+    color: var(--gold-lt);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 0.65rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+}
+.calc-table td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: var(--cream);
+    vertical-align: middle;
+}
+.calc-table tr:last-child td { border-bottom: none; }
+.calc-table tr:hover td { background: rgba(201,168,76,0.05); }
+.calc-table .highlight td {
+    font-weight: 600;
+    color: var(--gold-lt);
+    background: rgba(201,168,76,0.08);
+}
+.calc-table .total-row td {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--gold);
+    background: rgba(201,168,76,0.12);
+    border-top: 1px solid rgba(201,168,76,0.4);
+}
+.tag-free {
+    background: rgba(46,204,113,0.2);
+    color: var(--green);
+    border: 1px solid rgba(46,204,113,0.4);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+}
+.tag-partial {
+    background: rgba(201,168,76,0.2);
+    color: var(--gold-lt);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+/* ── Amortization Table ── */
+.amort-wrap {
+    background: #0f1e2e;
+    border: 1px solid rgba(201,168,76,0.15);
+    border-radius: 12px;
+    overflow: hidden;
+    max-height: 380px;
+    overflow-y: auto;
+}
+.amort-wrap::-webkit-scrollbar { width: 6px; }
+.amort-wrap::-webkit-scrollbar-track { background: #0D1B2A; }
+.amort-wrap::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+/* ── Info Box ── */
+.info-box {
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    font-size: 0.83rem;
+    color: var(--cream);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+.info-box strong { color: var(--gold-lt); }
+
+/* ── Angsuran highlight ── */
+.angsuran-box {
+    background: linear-gradient(135deg, rgba(201,168,76,0.18), rgba(201,168,76,0.06));
+    border: 2px solid rgba(201,168,76,0.5);
+    border-radius: 14px;
+    padding: 1.5rem 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+.angsuran-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 0.4rem;
+}
+.angsuran-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--gold);
+}
+.angsuran-sub {
+    font-size: 0.8rem;
+    color: var(--slate);
+    margin-top: 0.3rem;
+}
+
+/* ── Footer ── */
+.footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.75rem;
+    color: var(--slate);
+    border-top: 1px solid rgba(201,168,76,0.15);
+    margin-top: 2rem;
+    letter-spacing: 0.05em;
+}
+.footer span { color: var(--gold-lt); }
+
+/* ── Divider ── */
+.gold-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent);
+    margin: 1.5rem 0;
+}
+
+/* Override streamlit number input */
+.stNumberInput input {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(201,168,76,0.3) !important;
+    border-radius: 8px !important;
+    color: var(--cream) !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
+# ─── Helpers ──────────────────────────────────────────────────────────────────
+def fmt_idr(value: float) -> str:
+    """Format number as Indonesian Rupiah."""
+    if value >= 1_000_000_000:
+        return f"Rp {value/1_000_000_000:,.3f} M".replace(",", ".")
+    return f"Rp {value:,.0f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def fmt_idr_short(value: float) -> str:
+    """Compact Rupiah format for metric cards."""
+    if value >= 1_000_000_000:
+        b = value / 1_000_000_000
+        return f"Rp {b:.3f} M".replace(".", ",") if b < 10 else f"Rp {b:.2f} M".replace(".", ",")
+    elif value >= 1_000_000:
+        return f"Rp {value/1_000_000:,.1f} Jt".replace(",", ".")
+    return f"Rp {value:,.0f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+def hitung_ppn(harga: float) -> tuple[float, float, str]:
+    """
+    Aturan Free PPN 2026:
+    - Harga ≤ 2 M   → bebas PPN (0%)
+    - Harga > 2 M   → PPN hanya untuk selisih di atas 2 M (sisa kena 11%)
+    Mengembalikan (ppn_amount, ppn_rate_display, keterangan)
+    """
+    batas = 2_000_000_000
+    if harga <= batas:
+        return 0.0, 0.0, "Bebas PPN (Free PPN 2026 ≤ Rp 2 M)"
+    else:
+        kena_ppn = harga - batas
+        ppn = kena_ppn * 0.11
+        rate_eff = (ppn / harga) * 100
+        return ppn, rate_eff, f"PPN 11% atas selisih Rp 2 M (Free PPN 2026 > Rp 2 M)"
+
+
+def hitung_angsuran(pokok: float, bunga_tahunan: float, tenor_bulan: int) -> float:
+    """Hitung angsuran bulanan flat / anuitas."""
+    if pokok <= 0 or tenor_bulan <= 0:
+        return 0.0
+    if bunga_tahunan == 0:
+        return pokok / tenor_bulan
+    r = bunga_tahunan / 100 / 12
+    return pokok * r * (1 + r)**tenor_bulan / ((1 + r)**tenor_bulan - 1)
+
+
+def buat_amortisasi(pokok: float, bunga_tahunan: float, tenor_bulan: int):
+    """Generate tabel amortisasi per bulan."""
+    rows = []
+    sisa = pokok
+    r = bunga_tahunan / 100 / 12
+    angsuran = hitung_angsuran(pokok, bunga_tahunan, tenor_bulan)
+    for bln in range(1, tenor_bulan + 1):
+        bunga_bln = sisa * r
+        cicil_pokok = angsuran - bunga_bln
+        sisa -= cicil_pokok
+        rows.append({
+            "Bulan": bln,
+            "Angsuran": angsuran,
+            "Bunga": bunga_bln,
+            "Pokok": cicil_pokok,
+            "Sisa Pokok": max(sisa, 0),
+        })
+    return rows
+
+
+# ─── Sidebar – Input ───────────────────────────────────────────────────────────
+with st.sidebar:
+    st.markdown("""
+    <div style="padding:1rem 0 0.5rem">
+        <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;
+             background:linear-gradient(135deg,#E8C97B,#C9A84C);
+             -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+             background-clip:text;">🏠 Ruang Masbay</div>
+        <div style="font-size:0.7rem;color:#6B7A8D;letter-spacing:0.12em;
+             text-transform:uppercase;margin-top:2px;">KPR Simulator 2026</div>
+    </div>
+    <hr style="border-color:rgba(201,168,76,0.2);margin:0.5rem 0 1rem">
+    """, unsafe_allow_html=True)
+
+    st.markdown("**📐 Tipe Rumah**")
+    tipe_lantai = st.selectbox(
+        "Jumlah Lantai",
+        options=["1 Lantai", "2 Lantai", "3 Lantai"],
+        index=1,
+    )
+
+    st.markdown("---")
+    st.markdown("**💰 Harga & Pembayaran**")
+
+    harga_rumah = st.number_input(
+        "Harga Rumah (Rp)",
+        min_value=500_000_000,
+        max_value=20_000_000_000,
+        value=2_500_000_000,
+        step=50_000_000,
+        format="%d",
+        help="Masukkan harga rumah dalam Rupiah",
+    )
+
+    dp_pct = st.slider(
+        "Down Payment (%)",
+        min_value=0,
+        max_value=90,
+        value=20,
+        step=1,
+        help="Persentase DP dari harga rumah",
+    )
+
+    utj = st.number_input(
+        "UTJ – Uang Tanda Jadi (Rp)",
+        min_value=0,
+        max_value=500_000_000,
+        value=10_000_000,
+        step=1_000_000,
+        format="%d",
+        help="UTJ yang sudah dibayarkan (akan dikurangi dari DP)",
+    )
+
+    st.markdown("---")
+    st.markdown("**📊 Kredit**")
+
+    bunga = st.slider(
+        "Suku Bunga (%/tahun)",
+        min_value=3.0,
+        max_value=15.0,
+        value=7.5,
+        step=0.25,
+        format="%.2f",
+    )
+
+    tenor = st.slider(
+        "Tenor (tahun)",
+        min_value=1,
+        max_value=30,
+        value=20,
+        step=1,
+    )
+
+    st.markdown("---")
+    st.markdown("""
+    <div style="font-size:0.72rem;color:#6B7A8D;line-height:1.6;padding:0.5rem 0">
+        ⚠️ <em>Simulasi ini bersifat estimasi. Angka final tergantung kebijakan bank & notaris setempat.</em>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# ─── Kalkulasi Utama ───────────────────────────────────────────────────────────
+dp_nominal     = harga_rumah * dp_pct / 100
+dp_kurang_utj  = max(dp_nominal - utj, 0)
+sisa_dp_bayar  = dp_kurang_utj                   # yang harus dibayar setelah UTJ
+pokok_kpr      = harga_rumah - dp_nominal
+
+ppn_nominal, ppn_rate_eff, ppn_ket = hitung_ppn(harga_rumah)
+ajb            = harga_rumah * 0.005
+bphtb          = harga_rumah * 0.05
+
+total_biaya_transaksi = ajb + bphtb + ppn_nominal
+total_modal_awal      = dp_nominal + total_biaya_transaksi
+
+tenor_bulan    = tenor * 12
+angsuran_bln   = hitung_angsuran(pokok_kpr, bunga, tenor_bulan)
+total_bayar_kpr = angsuran_bln * tenor_bulan
+total_bunga    = total_bayar_kpr - pokok_kpr
+
+tipe_icon = {"1 Lantai": "🏠", "2 Lantai": "🏡", "3 Lantai": "🏰"}[tipe_lantai]
+
+
+# ─── Header ───────────────────────────────────────────────────────────────────
+st.markdown(f"""
+<div class="header-wrap">
+    <div class="logo-row">
+        <div class="logo-icon">🏠</div>
+        <div>
+            <div class="brand-name">Ruang Masbay</div>
+            <div class="brand-tagline">Property Intelligence · Est. 2024</div>
+        </div>
+    </div>
+    <div class="gold-divider" style="margin:0.75rem 0 0.75rem"></div>
+    <div class="header-title">Simulasi KPR – Free PPN 2026</div>
+    <div class="header-sub">
+        {tipe_icon} Rumah {tipe_lantai} &nbsp;·&nbsp;
+        Suku Bunga {bunga:.2f}%/thn &nbsp;·&nbsp;
+        Tenor {tenor} Tahun &nbsp;·&nbsp;
+        📅 {datetime.now().strftime("%d %B %Y")}
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+
+# ─── Angsuran Hero ────────────────────────────────────────────────────────────
+st.markdown(f"""
+<div class="angsuran-box">
+    <div class="angsuran-label">Estimasi Angsuran Bulanan</div>
+    <div class="angsuran-value">{fmt_idr_short(angsuran_bln)}</div>
+    <div class="angsuran-sub">
+        Tenor {tenor} tahun ({tenor_bulan} bulan) · Bunga {bunga:.2f}%/thn · Pokok KPR {fmt_idr_short(pokok_kpr)}
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+
+# ─── Metric Cards ─────────────────────────────────────────────────────────────
+st.markdown(f"""
+<div class="metric-grid">
+    <div class="metric-card">
+        <div class="metric-label">Harga Rumah</div>
+        <div class="metric-value big">{fmt_idr_short(harga_rumah)}</div>
+        <div class="metric-note">{tipe_icon} {tipe_lantai}</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Down Payment ({dp_pct}%)</div>
+        <div class="metric-value">{fmt_idr_short(dp_nominal)}</div>
+        <div class="metric-note">UTJ: {fmt_idr_short(utj)} · Sisa DP: {fmt_idr_short(sisa_dp_bayar)}</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Pokok KPR</div>
+        <div class="metric-value">{fmt_idr_short(pokok_kpr)}</div>
+        <div class="metric-note">Harga − DP</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Total PPN</div>
+        <div class="metric-value" style="color:{'#2ECC71' if ppn_nominal == 0 else '#E8C97B'}">
+            {fmt_idr_short(ppn_nominal) if ppn_nominal > 0 else 'BEBAS PPN'}
+        </div>
+        <div class="metric-note">{'Free PPN 2026 ✓' if ppn_nominal == 0 else f'11% selisih > Rp 2 M'}</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Total Bunga</div>
+        <div class="metric-value">{fmt_idr_short(total_bunga)}</div>
+        <div class="metric-note">Selama {tenor} tahun</div>
+    </div>
+    <div class="metric-card">
+        <div class="metric-label">Modal Awal</div>
+        <div class="metric-value">{fmt_idr_short(total_modal_awal)}</div>
+        <div class="metric-note">DP + Biaya Transaksi</div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+
+# ─── Info PPN ─────────────────────────────────────────────────────────────────
+if ppn_nominal == 0:
+    ppn_info = f"""
+    ✅ <strong>BEBAS PPN!</strong> Harga rumah Anda (Rp {harga_rumah/1e9:.2f} M) berada di bawah batas Rp 2 Miliar.
+    Berdasarkan kebijakan <strong>Free PPN 2026</strong>, tidak ada PPN yang dikenakan.
+    """
+else:
+    selisih = harga_rumah - 2_000_000_000
+    ppn_info = f"""
+    ⚡ <strong>PPN Parsial.</strong> Harga rumah Anda melebihi Rp 2 Miliar.
+    PPN 11% hanya dikenakan atas selisih <strong>Rp {selisih/1e6:.0f} Jt</strong> (di atas Rp 2 M) = <strong>{fmt_idr_short(ppn_nominal)}</strong>.
+    Porsi Rp 2 M pertama tetap <strong>bebas PPN</strong> sesuai kebijakan Free PPN 2026.
+    """
+
+st.markdown(f'<div class="info-box">{ppn_info}</div>', unsafe_allow_html=True)
+
+
+# ─── Dua Kolom: Rincian + Amortisasi ─────────────────────────────────────────
+col_left, col_right = st.columns([1, 1], gap="large")
+
+with col_left:
+    # ── Rincian Harga & Biaya ──
+    st.markdown('<div class="section-title">Rincian Harga & Biaya Transaksi</div>', unsafe_allow_html=True)
+
+    ppn_tag = '<span class="tag-free">BEBAS</span>' if ppn_nominal == 0 else '<span class="tag-partial">PARSIAL</span>'
+
+    st.markdown(f"""
+    <table class="calc-table">
+        <thead>
+            <tr>
+                <th>Komponen</th>
+                <th>%</th>
+                <th style="text-align:right">Nominal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Harga Rumah ({tipe_lantai})</td>
+                <td>—</td>
+                <td style="text-align:right">{fmt_idr(harga_rumah)}</td>
+            </tr>
+            <tr>
+                <td>PPN &nbsp;{ppn_tag}</td>
+                <td>{ppn_rate_eff:.2f}%</td>
+                <td style="text-align:right">{fmt_idr(ppn_nominal)}</td>
+            </tr>
+            <tr>
+                <td>Biaya AJB (Akta Jual Beli)</td>
+                <td>0.5%</td>
+                <td style="text-align:right">{fmt_idr(ajb)}</td>
+            </tr>
+            <tr>
+                <td>BPHTB (Bea Perolehan Hak)</td>
+                <td>5%</td>
+                <td style="text-align:right">{fmt_idr(bphtb)}</td>
+            </tr>
+            <tr class="highlight">
+                <td colspan="2">Total Biaya Transaksi</td>
+                <td style="text-align:right">{fmt_idr(total_biaya_transaksi)}</td>
+            </tr>
+        </tbody>
+    </table>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="section-title">Rincian Down Payment</div>', unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <table class="calc-table">
+        <thead>
+            <tr>
+                <th>Komponen</th>
+                <th style="text-align:right">Nominal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>DP ({dp_pct}% × {fmt_idr_short(harga_rumah)})</td>
+                <td style="text-align:right">{fmt_idr(dp_nominal)}</td>
+            </tr>
+            <tr>
+                <td>UTJ – Uang Tanda Jadi (sudah bayar)</td>
+                <td style="text-align:right">− {fmt_idr(utj)}</td>
+            </tr>
+            <tr class="highlight">
+                <td>Sisa DP yang Harus Dibayar</td>
+                <td style="text-align:right">{fmt_idr(sisa_dp_bayar)}</td>
+            </tr>
+            <tr>
+                <td>+ Total Biaya Transaksi</td>
+                <td style="text-align:right">{fmt_idr(total_biaya_transaksi)}</td>
+            </tr>
+            <tr class="total-row">
+                <td>💼 Total Modal Awal</td>
+                <td style="text-align:right">{fmt_idr(total_modal_awal)}</td>
+            </tr>
+        </tbody>
+    </table>
+    """, unsafe_allow_html=True)
+
+with col_right:
+    # ── Rincian KPR ──
+    st.markdown('<div class="section-title">Rincian Kredit (KPR)</div>', unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <table class="calc-table">
+        <thead>
+            <tr>
+                <th>Komponen</th>
+                <th style="text-align:right">Nilai</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Pokok Pinjaman (KPR)</td>
+                <td style="text-align:right">{fmt_idr(pokok_kpr)}</td>
+            </tr>
+            <tr>
+                <td>Suku Bunga</td>
+                <td style="text-align:right">{bunga:.2f}% / tahun</td>
+            </tr>
+            <tr>
+                <td>Tenor</td>
+                <td style="text-align:right">{tenor} tahun ({tenor_bulan} bulan)</td>
+            </tr>
+            <tr class="highlight">
+                <td>📅 Angsuran / Bulan</td>
+                <td style="text-align:right">{fmt_idr(angsuran_bln)}</td>
+            </tr>
+            <tr>
+                <td>Total Pembayaran KPR</td>
+                <td style="text-align:right">{fmt_idr(total_bayar_kpr)}</td>
+            </tr>
+            <tr>
+                <td>Total Bunga yang Dibayar</td>
+                <td style="text-align:right">{fmt_idr(total_bunga)}</td>
+            </tr>
+            <tr class="total-row">
+                <td>📊 Total Pengeluaran (Modal + KPR)</td>
+                <td style="text-align:right">{fmt_idr(total_modal_awal + total_bayar_kpr)}</td>
+            </tr>
+        </tbody>
+    </table>
+    """, unsafe_allow_html=True)
+
+    # ── Amortisasi ──
+    st.markdown('<div class="section-title">Tabel Amortisasi (per Bulan)</div>', unsafe_allow_html=True)
+
+    amort_rows = buat_amortisasi(pokok_kpr, bunga, tenor_bulan)
+
+    # Build HTML table
+    rows_html = ""
+    for r in amort_rows:
+        rows_html += f"""
+        <tr>
+            <td style="text-align:center">{r['Bulan']}</td>
+            <td style="text-align:right">{fmt_idr_short(r['Angsuran'])}</td>
+            <td style="text-align:right;color:#C9A84C">{fmt_idr_short(r['Bunga'])}</td>
+            <td style="text-align:right;color:#2ECC71">{fmt_idr_short(r['Pokok'])}</td>
+            <td style="text-align:right">{fmt_idr_short(r['Sisa Pokok'])}</td>
+        </tr>
+        """
+
+    st.markdown(f"""
+    <div class="amort-wrap">
+        <table class="calc-table" style="margin:0">
+            <thead>
+                <tr>
+                    <th style="text-align:center">Bln</th>
+                    <th style="text-align:right">Angsuran</th>
+                    <th style="text-align:right">Bunga</th>
+                    <th style="text-align:right">Pokok</th>
+                    <th style="text-align:right">Sisa</th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows_html}
+            </tbody>
+        </table>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+# ─── Disclaimer & Footer ──────────────────────────────────────────────────────
+st.markdown('<div class="gold-divider"></div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="info-box" style="font-size:0.78rem;color:#6B7A8D">
+    📌 <strong style="color:#E8C97B">Catatan Penting:</strong>
+    Simulasi ini menggunakan metode anuitas (angsuran tetap). Biaya AJB & BPHTB adalah estimasi standar dan dapat berbeda tergantung kebijakan notaris/PPAT setempat.
+    PPN dihitung berdasarkan kebijakan <strong style="color:#E8C97B">Free PPN 2026</strong> Pemerintah Indonesia.
+    Konsultasikan dengan agen properti atau banker Anda untuk angka final.
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown(f"""
+<div class="footer">
+    © {datetime.now().year} <span>Ruang Masbay</span> · All Rights Reserved<br>
+    <span style="font-size:0.68rem">Simulasi KPR Free PPN 2026 · Powered by Ruang Masbay Property Intelligence</span>
+</div>
+""", unsafe_allow_html=True)
+
+
+# 🏠 Simulasi KPR – Ruang Masbay
+> **Free PPN 2026 · KPR Calculator · Professional Property Tool**
+
+Aplikasi simulasi KPR (Kredit Pemilikan Rumah) berbasis Streamlit dengan kebijakan **Free PPN 2026** Pemerintah Indonesia.
+
+---
+
+## ✨ Fitur Utama
+
+| Fitur | Keterangan |
+|---|---|
+| 🏠 Tipe Rumah | 1, 2, atau 3 lantai |
+| 💰 Harga Rumah | Dapat diubah bebas (500 Jt – 20 M) |
+| 📊 DP Fleksibel | 0–90% dengan slider |
+| 🔑 UTJ | Uang Tanda Jadi dikurangi dari DP |
+| 📈 Suku Bunga | 3–15% per tahun |
+| ⏳ Tenor | 1–30 tahun |
+| 🧾 Free PPN 2026 | ≤ Rp 2 M → 0%, > Rp 2 M → 11% selisih |
+| 📋 Biaya AJB | 0.5% dari harga |
+| 🏛️ BPHTB | 5% dari harga |
+| 📅 Amortisasi | Tabel cicilan per bulan |
+
+---
+
+## 🚀 Cara Deploy ke Streamlit Cloud
+
+### 1. Upload ke GitHub
+```bash
+git init
+git add .
+git commit -m "feat: KPR Simulator Ruang Masbay"
+git remote add origin https://github.com/USERNAME/kpr-ruang-masbay.git
+git push -u origin main
+```
+
+### 2. Deploy di Streamlit Cloud
+1. Buka [share.streamlit.io](https://share.streamlit.io)
+2. Login dengan GitHub
+3. Klik **New app**
+4. Pilih repository, branch `main`, file `app.py`
+5. Klik **Deploy**
+
+### 3. Jalankan Lokal (Opsional)
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+---
+
+## 📐 Formula Perhitungan
+
+### PPN (Free PPN 2026)
+```
+Harga ≤ Rp 2.000.000.000  → PPN = 0 (BEBAS)
+Harga > Rp 2.000.000.000  → PPN = (Harga − Rp 2 M) × 11%
+```
+
+### Angsuran Bulanan (Anuitas)
+```
+r  = suku_bunga / 12 / 100
+M  = P × r × (1+r)^n / ((1+r)^n − 1)
+```
+
+### Biaya Transaksi
+```
+AJB   = Harga × 0.5%
+BPHTB = Harga × 5%
+```
+
+---
+
+## 📁 Struktur File
+
+```
+kpr-ruang-masbay/
+├── app.py              ← Aplikasi utama Streamlit
+├── requirements.txt    ← Dependencies
+└── README.md           ← Dokumentasi ini
+```
+
+---
+
+## ⚠️ Disclaimer
+
+Simulasi ini bersifat estimasi. Angka final tergantung kebijakan bank dan notaris/PPAT setempat. Konsultasikan dengan agen properti Anda.
+
+---
+
+<div align="center">
+
+© 2026 **Ruang Masbay** · All Rights Reserved  
+*Property Intelligence · Powered by Streamlit*
+
+</div>
